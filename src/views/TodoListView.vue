@@ -9,7 +9,7 @@
     /><button @click="addTodo">Add</button>
     <ul>
       <li v-for="(todo, index) in todos" :key="index">
-        <span>{{ index + 1 }}.</span><span>{{ todo.text }}</span>
+        <span :class="{ completed: todo.completed }" @click="toggle(index)">{{ todo.text }}</span>
         <button @click="removeTodo(index)">Remove</button>
       </li>
     </ul>
@@ -32,6 +32,9 @@ function addTodo() {
 }
 function removeTodo(index: number) {
   todos.value.splice(index, 1)
+}
+function toggle(index: number){
+  todos.value[index].completed = !todos.value[index].completed
 }
 const todos = ref<Todo[]>([
   {
