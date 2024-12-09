@@ -4,7 +4,7 @@
     <div>
       <input type="text" placeholder="Enter email" v-model="form.email" />
       <input type="password" placeholder="Enter password" v-model="form.password" />
-      <button @click="addUser">Save</button>
+      <button @click="save">Save</button>
       <button>Cancel</button>
     </div>
     <div>
@@ -22,7 +22,13 @@
             <td>{{ user.id }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.password }}</td>
-            <td><button>Edit</button><button>Delete</button></td>
+            <td>
+              <button @click="editUser(user.id)">Edit</button
+              ><button @click="deleteUser(user.id)">Delete</button>
+            </td>
+          </tr>
+          <tr v-if="users.length === 0">
+            <td colspan="4">No Data</td>
           </tr>
         </tbody>
       </table>
@@ -40,11 +46,38 @@ interface User {
 const form = ref<User>({ id: 0, email: '', password: '' })
 const users = ref<User[]>([])
 const lastId = ref(1)
-const editedId = ref<number | null>(null)
+const editedIndex = ref<number | null>(null)
+function save() {
+  if (editedIndex.value != null) {
+    updateUser()
+  } else {
+    addUser()
+  }
+}
+function editUser(id: number) {
+  const index = users.value.findIndex(function (item) {
+    return item.id === id
+  })
+  editedIndex.value = index
+  form.value = { ...users.value[index] }
+}
+function updateUser() {
+  if (editedIndex.value !== null) {
+    users.value[editedIndex.value!] = { ...form.value }
+    clearForm()
+    editedIndex.value = null
+  }
+}
 function addUser() {
   users.value.push({ ...form.value, id: lastId.value })
   lastId.value++
   clearForm()
+}
+function deleteUser(id: number) {
+  const index = users.value.findIndex(function (item) {
+    return item.id === id
+  })
+  users.value.splice(index, 1)
 }
 function clearForm() {
   form.value = { id: 0, email: '', password: '' }
