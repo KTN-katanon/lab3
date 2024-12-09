@@ -14,10 +14,13 @@
       <button @click="filter = 'not_completed'">Not Complete</button>
       <button @click="filter = 'all'">All</button>
     </div>
-    <ul>
-      <li v-for="(todo, index) in filterTodos" :key="index">
-        <span :class="{ completed: todo.completed }" @click="toggle(index)">{{ todo.text }}</span>
-        <button @click="removeTodo(index)">Remove</button>
+    <div v-if="filterTodos.length === 0">No items</div>
+    <ul v-if="filterTodos.length > 0">
+      <li v-for="todo in filterTodos" :key="todo.id">
+        <span :class="{ completed: todo.completed }" @click="toggle(todo.id)"
+          >{{ todo.id }}{{ todo.text }}</span
+        >
+        <button @click="removeTodo(todo.id)">Remove</button>
       </li>
     </ul>
   </div>
@@ -26,33 +29,46 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 interface Todo {
+  id: number
   text: string
   completed: boolean
 }
+let lastId: number = 3
 function addTodo() {
   if (newTodo.value.trim() === '') return
   todos.value.push({
+    id: lastId,
     text: newTodo.value.trim(),
     completed: false,
   })
+  lastId++
   newTodo.value = ''
 }
-function removeTodo(index: number) {
+function removeTodo(id: number) {
+  const index = todos.value.findIndex(function (item) {
+    return item.id === id
+  })
   todos.value.splice(index, 1)
 }
-function toggle(index: number) {
+function toggle(id: number) {
+  const index = todos.value.findIndex(function (item) {
+    return item.id === id
+  })
   todos.value[index].completed = !todos.value[index].completed
 }
 const todos = ref<Todo[]>([
   {
+    id: 0,
     text: 'abc',
     completed: false,
   },
   {
+    id: 1,
     text: 'def',
     completed: true,
   },
   {
+    id: 2,
     text: 'ghi',
     completed: false,
   },
